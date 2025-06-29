@@ -272,6 +272,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     importInput.onchange = importFromJsonFile;
     document.body.appendChild(importInput);
 
+    // Set up automatic sync every 30 seconds
+    setInterval(async () => {
+        console.log('Auto-syncing quotes...');
+        await syncQuotes();
+    }, 30000);
+
     // Optionally, show last viewed quote from session storage
     const lastIndex = sessionStorage.getItem(LAST_QUOTE_INDEX_KEY);
     if (lastIndex !== null && quotes[lastIndex]) {
