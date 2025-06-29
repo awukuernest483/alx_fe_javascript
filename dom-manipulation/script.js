@@ -30,6 +30,18 @@ function addQuote() {
     }
 }
 
+function createAddQuoteForm() {
+    const form = document.createElement('div');
+    form.innerHTML = `
+        <input type="text" id="newQuoteText" placeholder="Quote text" />
+        <input type="text" id="newQuoteCategory" placeholder="Category" />
+        <button id="addQuoteBtn">Add Quote</button>
+    `;
+    document.body.appendChild(form);
+    document.getElementById('addQuoteBtn').addEventListener('click', addQuote);
+}
+
+
 document.addEventListener('DOMContentLoaded', () => {
     showRandomQuote();
     document.getElementById('newQuote').addEventListener('click', showRandomQuote);
