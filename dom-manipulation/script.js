@@ -11,7 +11,8 @@ async function syncQuotes() {
         const serverFetchSuccess = await fetchQuotesFromServer();
 
         if (serverFetchSuccess) {
-            console.log('Quotes synced from server');
+            alert('Quotes synced with server!');
+            console.log('Quotes synced with server!');
             populateCategories();
             filterQuotes();
             return true;
@@ -275,7 +276,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Set up automatic sync every 30 seconds
     setInterval(async () => {
         console.log('Auto-syncing quotes...');
-        await syncQuotes();
+        const success = await syncQuotes();
+        if (success) {
+            console.log('Quotes synced with server!');
+        }
     }, 30000);
 
     // Optionally, show last viewed quote from session storage
