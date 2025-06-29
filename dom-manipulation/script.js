@@ -4,8 +4,26 @@ const LAST_CATEGORY_KEY = 'lastCategoryFilter';
 
 let quotes = [];
 
+// Fetch quotes from server
+async function fetchQuotesFromServer() {
+    try {
+        const response = await fetch('/api/quotes');
+        if (response.ok) {
+            const serverQuotes = await response.json();
+            if (Array.isArray(serverQuotes) && serverQuotes.length > 0) {
+                quotes = serverQuotes;
+                saveQuotes();
+                return true;
+            }
+        }
+    } catch (error) {
+        console.log('Failed to fetch quotes from server:', error);
+    }
+    return false;
+}
+
 // Load quotes from localStorage or use defaults
-function loadQuotes() {
+async function loadQuotes() {
     const stored = localStorage.getItem(QUOTES_KEY);
     if (stored) {
         try {
@@ -14,7 +32,12 @@ function loadQuotes() {
             quotes = [];
         }
     }
-    if (!quotes.length) {
+
+    // Try to fetch from server first
+    const serverFetchSuccess = await fetchQuotesFromServer();
+
+    // If no quotes from server and no local quotes, use defaults
+    if (!serverFetchSuccess && !quotes.length) {
         quotes = [
             { text: "The only way to do great work is to love what you do.", category: "Motivation" },
             { text: "Life is what happens when you're busy making other plans.", category: "Life" },
@@ -157,7 +180,7 @@ function importFromJsonFile(event) {
     fileReader.readAsText(event.target.files[0]);
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     // Add category filter dropdown
     let filter = document.getElementById('categoryFilter');
     if (!filter) {
@@ -167,7 +190,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.insertBefore(filter, document.body.firstChild);
     }
 
-    loadQuotes();
+    await loadQuotes();
     populateCategories();
 
     // Restore last selected filter and show quotes
