@@ -4,6 +4,27 @@ const LAST_CATEGORY_KEY = 'lastCategoryFilter';
 
 let quotes = [];
 
+// Send quotes to server
+async function sendQuotesToServer(quoteData) {
+    try {
+        const response = await fetch('https://jsonplaceholder.typicode.com/posts', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(quoteData)
+        });
+        if (response.ok) {
+            const result = await response.json();
+            console.log('Quote sent to server:', result);
+            return true;
+        }
+    } catch (error) {
+        console.log('Failed to send quote to server:', error);
+    }
+    return false;
+}
+
 // Fetch quotes from server
 async function fetchQuotesFromServer() {
     try {
@@ -26,7 +47,6 @@ async function fetchQuotesFromServer() {
     }
     return false;
 }
-
 
 // Load quotes from localStorage or use defaults
 async function loadQuotes() {
@@ -58,22 +78,22 @@ function saveQuotes() {
 }
 
 function populateCategories() {
+    let categories = [...new Set(quotes.map(q => q.category))];
+    const filter = document.getElementById('categoryFilter');
+    if (!filter) return;
+    filter.innerHTML = `<option value="all">All Categories</option>`;
+    categories.forEach(cat => {
+        const option = document.createElement('option');
+        option.value = cat;
+        option.textContent = cat;
+        filter.appendChild(option);
+    });
+    // Restore last selected filter
+    const lastCategory = localStorage.getItem(LAST_CATEGORY_KEY);
+    if (lastCategory && [...filter.options].some(opt => opt.value === lastCategory)) {
+        filter.value = lastCategory;
+    }
 }
-const filter = document.getElementById('categoryFilter');
-if (!filter) return;
-filter.innerHTML = `<option value="all">All Categories</option>`;
-categories.forEach(cat => {
-    const option = document.createElement('option');
-    option.value = cat;
-    option.textContent = cat;
-    filter.appendChild(option);
-});
-// Restore last selected filter
-const lastCategory = localStorage.getItem(LAST_CATEGORY_KEY);
-if (lastCategory && [...filter.options].some(opt => opt.value === lastCategory)) {
-    filter.value = lastCategory;
-}
-
 
 function filterQuotes() {
     const filter = document.getElementById('categoryFilter');
@@ -124,8 +144,13 @@ function addQuote() {
     const text = textInput.value.trim();
     const category = categoryInput.value.trim();
     if (text && category) {
-        quotes.push({ text, category });
+        const newQuote = { text, category };
+        quotes.push(newQuote);
         saveQuotes();
+
+        // Send to server
+        sendQuotesToServer(newQuote);
+
         populateCategories();
         // If new category, select it
         const filter = document.getElementById('categoryFilter');
