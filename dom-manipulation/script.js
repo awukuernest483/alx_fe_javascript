@@ -4,6 +4,27 @@ const LAST_CATEGORY_KEY = 'lastCategoryFilter';
 
 let quotes = [];
 
+// Sync quotes between local and server
+async function syncQuotes() {
+    try {
+        // First, fetch quotes from server
+        const serverFetchSuccess = await fetchQuotesFromServer();
+
+        if (serverFetchSuccess) {
+            console.log('Quotes synced from server');
+            populateCategories();
+            filterQuotes();
+            return true;
+        } else {
+            console.log('Failed to sync quotes from server');
+            return false;
+        }
+    } catch (error) {
+        console.log('Error during quote sync:', error);
+        return false;
+    }
+}
+
 // Send quotes to server
 async function sendQuotesToServer(quoteData) {
     try {
@@ -230,6 +251,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     filterQuotes();
 
     document.getElementById('newQuote').addEventListener('click', showRandomQuote);
+
+    // Add sync button
+    const syncBtn = document.createElement('button');
+    syncBtn.textContent = 'Sync Quotes';
+    syncBtn.onclick = syncQuotes;
+    document.body.appendChild(syncBtn);
 
     // Add export button
     const exportBtn = document.createElement('button');
