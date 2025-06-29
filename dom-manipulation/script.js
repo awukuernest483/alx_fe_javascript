@@ -48,11 +48,11 @@ function populateCategories() {
 
 function filterQuotes() {
     const filter = document.getElementById('categoryFilter');
-    const selected = filter ? filter.value : 'all';
-    localStorage.setItem(LAST_CATEGORY_KEY, selected);
+    const selectedCategory = filter ? filter.value : 'all';
+    localStorage.setItem(LAST_CATEGORY_KEY, selectedCategory);
     const container = document.getElementById('quoteDisplay');
     if (!container) return;
-    let filtered = selected === 'all' ? quotes : quotes.filter(q => q.category === selected);
+    let filtered = selectedCategory === 'all' ? quotes : quotes.filter(q => q.category === selectedCategory);
     if (filtered.length === 0) {
         container.innerHTML = `<p>No quotes found for this category.</p>`;
         return;
@@ -68,8 +68,8 @@ function filterQuotes() {
 
 function showRandomQuote() {
     const filter = document.getElementById('categoryFilter');
-    const selected = filter ? filter.value : 'all';
-    let filtered = selected === 'all' ? quotes : quotes.filter(q => q.category === selected);
+    const selectedCategory = filter ? filter.value : 'all';
+    let filtered = selectedCategory === 'all' ? quotes : quotes.filter(q => q.category === selectedCategory);
     const container = document.getElementById('quoteDisplay');
     if (!container) return;
     if (filtered.length === 0) {
